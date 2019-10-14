@@ -24,17 +24,16 @@ schema_user = {
                'role': {
                    'type': 'string',
                    'required': True,
-                   'allowed': ['solid', 'merchant']
+                   'allowed': ['global', 'merchant']
                }
 }
 
 
 # /user/add
 class UserCreateView(HTTPMethodView):
-    decorators = [auth.authorized(roles=['solid', 'admin']), validate_json(schema_user)]
+    decorators = [auth.authorized(roles=['global', 'admin']), validate_json(schema_user)]
 
     async def post(self, request, technical):
-        """Создание нового юзера и структуры в базе"""
         try:
             data = request.json
             logins = [x['login'] for x in await user.User.list_users(redis_conn=request.app.redis)]
@@ -61,10 +60,9 @@ class UserCreateView(HTTPMethodView):
 
 # /user/<id:int>
 class UserView(HTTPMethodView):
-    decorators = [auth.authorized(roles=['solid', 'admin']),  validate_json(schema_user, methods=['PUT'])]
+    decorators = [auth.authorized(roles=['global', 'admin']),  validate_json(schema_user, methods=['PUT'])]
 
     async def get(self, request, id, technical):
-        """Получение информации про юзера"""
         try:
             with await request.app.redis as redis:
                 curr_user = user.User(id=id, redis_conn=redis)
@@ -84,7 +82,6 @@ class UserView(HTTPMethodView):
                          }, status=500)
 
     async def put(self, request, id, technical):
-        """Обновление информации про юзера."""
         try:
             data = request.json
             with await request.app.redis as redis:
@@ -104,7 +101,6 @@ class UserView(HTTPMethodView):
                          }, status=500)
 
     async def delete(self, request, id, technical):
-        """Удаление информации про юзера."""
         try:
             with await request.app.redis as redis:
                 curr_user = user.User(id=id, redis_conn=redis)
@@ -118,7 +114,6 @@ class UserView(HTTPMethodView):
                          }, status=500)
 
     async def patch(self, request, id, technical):
-        """Обновляет токен АПИ данному пользователю"""
         try:
             with await request.app.redis as redis:
                 curr_user = user.User(id=id, redis_conn=redis)
@@ -140,10 +135,9 @@ class UserView(HTTPMethodView):
 
 #  /user/list
 class UserListView(HTTPMethodView):
-    decorators = [auth.authorized(roles=['solid', 'admin'])]
+    decorators = [auth.authorized(roles=['global', 'admin'])]
 
     async def get(self, request, technical):
-        """Выводит список всех юзеров и информации по ним. За исключением токенов и пароля."""
         try:
             with await request.app.redis as redis:
                 data = await user.User.list_users(redis_conn=redis)

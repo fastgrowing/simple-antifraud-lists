@@ -10,14 +10,12 @@ class User:
             self.redis = redis_conn
 
     async def build_key(self):
-        """Строим ключ обьекта"""
         search_key_result = await self.redis.keys(self.key)
         if len(search_key_result) == 1:
             self.key = search_key_result[0]
             self.token = self.key.split(':')[2]
 
     async def get_user(self):
-        """Получаем информацию о пользователе"""
         await self.build_key()
         if await self.redis.exists(self.key):
             return await self.redis.hgetall(self.key)
@@ -25,7 +23,6 @@ class User:
             return None
 
     async def create_user(self, data):
-        """Создает хэш-запись о новом пользователе в базе."""
         self.token = secrets.token_urlsafe(20)
         user_max_id = await self.redis.get('user_max_id')
         # increase user_max_id by one
@@ -36,12 +33,10 @@ class User:
         return self.id, self.token
 
     async def delete_user(self):
-        """Удаляет пользователя из базы."""
         await self.build_key()
         await self.redis.delete(self.key)
 
     async def update_user(self, data):
-        """Обновляет информацию о пользователе в базе."""
         await self.build_key()
         if await self.redis.exists(self.key) is not None:
             await self.redis.delete(self.key)
@@ -51,7 +46,7 @@ class User:
             return None, None
 
     async def refresh(self):
-        """Обновляет токен у пользователя"""
+        """Refresh the user token."""
         await self.build_key()
         if await self.redis.exists(self.key) is not None:
             self.token = secrets.token_urlsafe(20)
@@ -63,7 +58,6 @@ class User:
 
     @classmethod
     async def list_users(cls, redis_conn):
-        """Возвращает список всех пользователей, за исключением их токенов и ПАРОЛЕЙ!"""
         key = '*:user:*'
         data = []
         for item in await redis_conn.keys(key):

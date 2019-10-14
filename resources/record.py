@@ -97,7 +97,6 @@ class RecordView(HTTPMethodView):
     decorators = [auth.authorized()]
 
     async def get(self, request, attribute, id, technical):
-        """Проверка наличия значения определенного атрибута в списках."""
         try:
             with await request.app.redis as redis:
                 curr_record = Record(attribute, merchant=technical['merchant'], industry=technical['industry'],
@@ -115,7 +114,6 @@ class RecordView(HTTPMethodView):
                          }, status=500)
 
     async def delete(self, request, attribute, id, technical):
-        """Удаление значения определенного атрибута из списков"""
         try:
             with await request.app.redis as redis:
                 curr_record = Record(attribute, merchant=technical['merchant'], industry=technical['industry'],
@@ -134,10 +132,9 @@ class RecordCreateView(HTTPMethodView):
     decorators = [auth.authorized(), validate_json(schema_record)]
 
     async def post(self, request, attribute, technical):
-        """Добавление значения определенного атрибута в список."""
         try:
-            if request.json['merchant_id'] is None and technical['role'] in ['solid', 'admin']:
-                return json({"message": "User with role solid should include merchant id in request body."
+            if request.json['merchant_id'] is None and technical['role'] in ['global', 'admin']:
+                return json({"message": "User with role global should include merchant id in request body."
                          }, status=400)
             body = request.json
             data = dict()
@@ -146,7 +143,7 @@ class RecordCreateView(HTTPMethodView):
             data['created_at'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             data['added_by'] = technical['role']
             with await request.app.redis as redis:
-                if technical['role'] == 'solid':
+                if technical['role'] == 'global':
                     merch_search = Merchant(id=body['merchant_id'], redis_conn=redis)
                     id, merch_info = await merch_search.get_merchant()
                     if id is None:
@@ -173,19 +170,19 @@ class RecordCreateView(HTTPMethodView):
                      }, status=500)
 
 
-# /record/<attribute:string>/search  # добавить валидацию, добавить документашку merchant_id
+# /record/<attribute:string>/search
 class RecordSearchView(HTTPMethodView):
     decorators = [auth.authorized(), validate_json(schema_search)]
 
     async def post(self, request, attribute, technical):
         try:
-            if request.json['merchant_id'] is None and technical['role'] in ['solid', 'admin']:
-                return json({"message": "User with role solid should include merchant id in request body."
+            if request.json['merchant_id'] is None and technical['role'] in ['global', 'admin']:
+                return json({"message": "User with role global should include merchant id in request body."
                          }, status=400)
             search_value = request.json['value']
             merchant_id = request.json['merchant_id']
             with await request.app.redis as redis:
-                if technical['role'] == 'solid':
+                if technical['role'] == 'global':
                     merch_search = Merchant(id=merchant_id, redis_conn=redis)
                     id, merch_info = await merch_search.get_merchant()
                     if id is None:
@@ -222,15 +219,14 @@ class RecordListView(HTTPMethodView):
     decorators = [auth.authorized(), validate_json(schema_list)]
 
     async def post(self, request, attribute, technical):
-        """Получение списка всех записей со значениями определенного атрибута."""
         try:
-            if request.json['merchant_id'] is None and technical['role'] in ['solid', 'admin']:
-                return json({"message": "User with role solid should include merchant id in request body."
+            if request.json['merchant_id'] is None and technical['role'] in ['global', 'admin']:
+                return json({"message": "User with role global should include merchant id in request body."
                          }, status=400)
             else:
                 merchant_id = request.json['merchant_id']
             with await request.app.redis as redis:
-                if technical['role'] == 'solid':
+                if technical['role'] == 'global':
                     merch_search = Merchant(id=merchant_id, redis_conn=redis)
                     id, merch_info = await merch_search.get_merchant()
                     if id is None:
@@ -261,10 +257,9 @@ class RecordListAddView(HTTPMethodView):
     decorators = [auth.authorized(), validate_json(schema_listadd, methods=['POST'])]
 
     async def post(self, request, attribute, technical):
-        """Добавление множества значений определенного атрибута в определенный список."""
         try:
-            if request.json['merchant_id'] is None and technical['role'] in ['solid', 'admin']:
-                return json({"message": "User with role solid should include merchant id in request body."
+            if request.json['merchant_id'] is None and technical['role'] in ['global', 'admin']:
+                return json({"message": "User with role global should include merchant id in request body."
                          }, status=400)
             data = request.json
             merchant_id = data.pop('merchant_id')
@@ -273,7 +268,7 @@ class RecordListAddView(HTTPMethodView):
                 rec['created_at'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 rec['added_by'] = technical['role']
             with await request.app.redis as redis:
-                if technical['role'] == 'solid':
+                if technical['role'] == 'global':
                     merch_search = Merchant(id=merchant_id, redis_conn=redis)
                     id, merch_info = await merch_search.get_merchant()
                     if id is None:
@@ -303,7 +298,6 @@ class RecordPaymentView(HTTPMethodView):
     decorators = [auth.authorized(), validate_json(schema_payment_put, methods=['PUT']), validate_json(schema_payment, methods=['POST'])]
 
     async def post(self, request, technical):
-        """Проверка наличия данных платежа в списках. Для оптимизации будет реализовано через pipeline."""
         try:
             values = request.json
             order_id = values.pop('order_id')
@@ -351,7 +345,6 @@ class RecordPaymentView(HTTPMethodView):
                          }, status=500)
 
     async def put(self, request, technical):
-        """Добавление данных из платежа. Для оптимизации будет реализовано через pipeline."""
         try:
             data = request.json
             for key in data.keys():

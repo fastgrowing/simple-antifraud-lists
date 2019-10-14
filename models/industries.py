@@ -1,15 +1,15 @@
 class Industry:
-    industries = ['dating', 'herbs and diets', 'gambling', 'gaming', 'commercial']
+    industries = ['social', 'financial', 'gaming', 'commercial']
     key = 'industry'
 
     @classmethod
     async def create_industries(cls, redis_conn):
-        """Создаем базовый список всех индустрий."""
+        """Create the base list of all available industries."""
         for value in sorted(cls.industries):
             await redis_conn.rpush(cls.key, value)
 
     @classmethod
     async def list_industries(cls, redis_conn):
-        """Вовращаем список доступных индустрий."""
+        """Return the list of all available industries."""
         list = await redis_conn.lrange('industry', 0, -1)
         return list

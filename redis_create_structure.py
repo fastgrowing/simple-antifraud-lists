@@ -27,7 +27,7 @@ user_base = {
                'login': 'base',
                'password': 'base',
                'merchant_id': 0,
-               'role': 'solid'
+               'role': 'global'
 }
 
 merchant_data = {

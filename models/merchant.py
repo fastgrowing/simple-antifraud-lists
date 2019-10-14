@@ -6,13 +6,13 @@ class Merchant:
         self.redis = redis_conn
 
     async def build_key(self):
-        """Строим ключ обьекта"""
+        """Build the object key."""
         search_key_result = await self.redis.keys(self.key)
         if len(search_key_result) == 1:
             self.key = search_key_result[0]
 
     async def get_merchant(self):
-        """Получаем информацию о мерчанте"""
+        """Return the information for current merchants"""
         await self.build_key()
         if await self.redis.exists(self.key):
             return self.id, await self.redis.hgetall(self.key)
@@ -20,7 +20,7 @@ class Merchant:
             return None, None
 
     async def create_merchant(self, data):
-        """Создает хэш-запись о новом мерчанте в базе."""
+        """Create a record with merchant information"""
         merchant_max_id = await self.redis.get('merchant_max_id')
         # increase merchant_max_id by one
         self.id = int(merchant_max_id) + 1
@@ -30,12 +30,12 @@ class Merchant:
         return self.id, data
 
     async def delete_merchant(self):
-        """Удаляет мерчанта из базы."""
+        """Delete record with merchant information"""
         await self.build_key()
         await self.redis.delete(self.key)
 
     async def update_merchant(self, data):
-        """Обновляет информацию о мерчанте в базе."""
+        """Update record with merchant information"""
         await self.build_key()
         if await self.redis.exists(self.key) is not None:
             await self.redis.delete(self.key)
@@ -46,7 +46,7 @@ class Merchant:
 
     @classmethod
     async def list_merchants(cls, redis_conn):
-        """Возвращает список всех мерчантов"""
+        """Return the list of all merchants in db"""
         key = '*:merchant'
         data = []
         for item in await redis_conn.keys(key):

@@ -15,13 +15,12 @@ class Record:
         self.key = self.update_key()
         self.redis = redis_conn
 
-
     def update_key(self):
         return str(self.id) + ':' + self.industry + ':' + self.merchant + ':' + self.attribute + ':' \
                    + str(self.value)
 
     async def build_key(self):
-        """Строим ключ обьекта"""
+        """Build the object key"""
         self.key = self.update_key()
         search_key_result = await self.redis.keys(self.key)
         if len(search_key_result) == 1:
@@ -39,7 +38,7 @@ class Record:
         if result[0] is not None:
             return dict({'record_id': int(self.id), 'attribute': self.attribute, 'value': self.value, 'list': result[0],
                         'created_at': result[1], 'ttl': result[2]})
-        else: #  странная часть
+        else:
             return dict({'record_id': None, 'attribute': self.attribute, 'value': self.value,
                         'list': None, 'created_at': None})
 
@@ -81,12 +80,12 @@ class Payment:
         self.redis = redis_conn
 
     async def build_key(self, attribute, value, record_id='*'):
-        """Строим ключ для обьекта"""
+        """Building the object key"""
         self.key = '{var1}:{var2}:{var3}:{var4}:{var5}'.format(var1=record_id, var2=self.industry, var3=self.merchant,
                                                                var4=attribute, var5=value)
 
     async def add_payment(self, values):
-        """Добавляем значения аттрибутов платежа в списки мерчанта"""
+        """Adding payments attributes to the merchant lists."""
         pipe = self.redis.pipeline()
         result = dict()
         record_max_id = int(await self.redis.get('record_max_id'))
@@ -112,8 +111,7 @@ class Payment:
         return result
 
     async def find_payment(self, values):
-        # реализовать поиск в списке индустрий и в глобальном списке c приоритетом
-        """Проверяем значения аттрибутов платежа в списках мерчанта"""
+        """Check the attribute in the merchant list."""
         pipe = self.redis.pipeline()
         for item in values:
             value_data = values[item]
@@ -142,12 +140,10 @@ class RecordList:
         self.redis = redis_conn
 
     async def rebuild_key(self, value='*', record_id='*'):
-        """Строим ключ для обьекта"""
         self.key = '{var1}:{var2}:{var3}:{var4}:{var5}'.format(var1=record_id, var2=self.industry, var3=self.merchant,
                                                                var4=self.attribute, var5=value)
 
     async def list_records(self):
-        """Возвращает список всех записей данного атрибута в рамках данного мерчанта."""
         data = []
         for item in await self.redis.keys(self.key):
             t = dict()
@@ -159,7 +155,6 @@ class RecordList:
         return data
 
     async def add_records(self, data):
-        """Добавляем список записей определенного атрибута данному мерчанту"""
         result = []
         record_max_id = int(await self.redis.get('record_max_id'))
         for item in data['batch']:

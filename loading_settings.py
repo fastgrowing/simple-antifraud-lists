@@ -1,8 +1,7 @@
 from dotenv import load_dotenv
 import os
 
-# Загружаем локальные переменные
-
+# Loading the local env
 def load_variables():
     APP_ROOT = os.path.dirname(__file__)
     env_path = os.path.join(APP_ROOT, '.env')

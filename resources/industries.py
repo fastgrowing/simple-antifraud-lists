@@ -11,7 +11,6 @@ class IndustrieListView(HTTPMethodView):
     decorators = [auth.authorized()]
 
     async def get(self, request, technical):
-        """Листинг списка всех мерчантов"""
         try:
             with await request.app.redis as redis:
                 ind_list = await Industry.list_industries(redis_conn=redis)

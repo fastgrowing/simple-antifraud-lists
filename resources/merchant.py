@@ -27,10 +27,9 @@ schema_merchant = {
 
 # /merchant/add
 class MerchantCreateView(HTTPMethodView):
-    decorators = [auth.authorized(roles=['solid', 'admin']), validate_json(schema_merchant, methods=['POST'])]
+    decorators = [auth.authorized(roles=['global', 'admin']), validate_json(schema_merchant, methods=['POST'])]
 
     async def post(self, request, technical):
-        """Создание нового мерчанта и структуры в базе"""
         try:
             merchant_names = [x['name'] for x in await merchant.Merchant.list_merchants(redis_conn=request.app.redis)]
             data = request.json
@@ -51,10 +50,9 @@ class MerchantCreateView(HTTPMethodView):
 
 # /merchant/<id:int>/
 class MerchantView(HTTPMethodView):
-    decorators = [auth.authorized(roles=['solid', 'admin']), validate_json(schema_merchant, methods=['POST'])]
+    decorators = [auth.authorized(roles=['global', 'admin']), validate_json(schema_merchant, methods=['POST'])]
 
     async def get(self, request, id, technical):
-        """Получение информации опеределенного мерчанта"""
         try:
             with await request.app.redis as redis:
                 curr_merchant = merchant.Merchant(id=id, redis_conn=redis)
@@ -72,7 +70,6 @@ class MerchantView(HTTPMethodView):
                          }, status=500)
 
     async def post(self, request, id, technical):
-        """Обновление информации определенного мерчанта."""
         try:
             with await request.app.redis as redis:
                 curr_merchant = merchant.Merchant(id=id, redis_conn=redis)
@@ -93,7 +90,6 @@ class MerchantView(HTTPMethodView):
                          }, status=500)
 
     async def delete(self, request, id, technical):
-        """Удаление определенного мерчанта и удаление всей структуры его данных в базе."""
         try:
             with await request.app.redis as redis:
                 curr_merchant = merchant.Merchant(id=id, redis_conn=redis)
@@ -109,10 +105,9 @@ class MerchantView(HTTPMethodView):
 
 # /merchant/list
 class MerchantListView(HTTPMethodView):
-    decorators = [auth.authorized(roles=['solid', 'admin'])]
+    decorators = [auth.authorized(roles=['global', 'admin'])]
 
     async def get(self, request, technical):
-        """Листинг списка всех мерчантов"""
         try:
             with await request.app.redis as redis:
                 data = await merchant.Merchant.list_merchants(redis_conn=redis)

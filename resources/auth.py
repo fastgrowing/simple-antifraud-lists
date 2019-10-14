@@ -6,7 +6,7 @@ from sentry_sdk import capture_exception
 
 
 async def check_request_for_authorization_status(request):
-    """Достаём токен из хедера и проверяем его наличие в базе."""
+    """Check the request token."""
     token = request.token
     with await request.app.redis as redis:
         data = await auth.Auth.find_merchant_by_token(token, redis_conn=redis)
@@ -15,9 +15,8 @@ async def check_request_for_authorization_status(request):
     else:
         return False, None
 
-
-def authorized(roles=['merchant', 'admin', 'solid']):
-    """Обычная авторизация."""
+def authorized(roles=['merchant', 'admin', 'global']):
+    """Simple authorization"""
     def decorator(f):
         @wraps(f)
         async def decorated_function(request, *args, **kwargs):
@@ -36,14 +35,14 @@ def authorized(roles=['merchant', 'admin', 'solid']):
     return decorator
 
 
-def authorized_solid():
-    """Авторизация для методов доступых только для пользователей с ролью Solid."""
+def authorized_global():
+    """Authorization for the users with the special role."""
     def decorator(f):
         @wraps(f)
         async def decorated_function(request, *args, **kwargs):
             try:
                 is_authorized, data = await check_request_for_authorization_status(request)
-                if is_authorized and data['role'] == 'solid':
+                if is_authorized and data['role'] == 'global':
                     response = await f(request, technical=data, *args, **kwargs)
                     return response
                 else:

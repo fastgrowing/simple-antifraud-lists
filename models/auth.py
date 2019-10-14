@@ -2,7 +2,7 @@ class Auth:
 
     @classmethod
     async def find_merchant_by_token(cls, token, redis_conn):
-        """Находим и возвращаем информацию требуюмую для авторизационной функции."""
+        """Return the merchant information from authorization token."""
         search_key_result = await redis_conn.keys('*:user:' + str(token))
         if len(search_key_result) == 1:
             key = search_key_result[0]
