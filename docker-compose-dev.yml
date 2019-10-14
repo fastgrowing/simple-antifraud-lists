@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+
+### NGINX Server Container ##################################
+    antifraud:
+      build: .
+      mem_limit: 256m
+      #image: "533135976680.dkr.ecr.us-west-2.amazonaws.com/antifraud:${tag}"
+      #image: antifraud:latest
+      ports:
+        - '80:5000'
+      # env_file:
+      #   - antifraud.env
+      environment:
+        # REDIS_HOST: antifraud-stage.nbdgkd.0001.usw2.cache.amazonaws.com
+        REDIS_HOST: redis
+        REDIS_PORT: 6379
+        REDIS_DB: 1
+        # REDIS_PASSWORD: password
+
+    redis:
+      image: redis:3.2-alpine
+      ports:
+        - '6379:6379'
