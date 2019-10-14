@@ -3,8 +3,6 @@ from models import auth
 from functools import wraps
 from sentry_sdk import capture_exception
 
-
-
 async def check_request_for_authorization_status(request):
     """Check the request token."""
     token = request.token

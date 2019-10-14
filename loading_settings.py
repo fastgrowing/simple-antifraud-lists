@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 
+
 # Loading the local env
 def load_variables():
     APP_ROOT = os.path.dirname(__file__)

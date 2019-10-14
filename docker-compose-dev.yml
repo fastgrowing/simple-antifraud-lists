@@ -1,7 +1,5 @@
 version: '2'
-
 services:
-
 ### NGINX Server Container ##################################
     antifraud:
       build: .

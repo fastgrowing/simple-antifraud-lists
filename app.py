@@ -21,7 +21,6 @@ app.config.update(
             # 'ssl': None,
              'encoding': 'utf-8',
             # 'minsize': 1,
-            # 'maxsize': 10
         }
     }
 )

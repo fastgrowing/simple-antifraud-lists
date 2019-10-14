@@ -164,7 +164,7 @@ class RecordCreateView(HTTPMethodView):
                 return json({
                     "message": "Record with such value is already existed."
                 }, status=409)
-        except Exception:
+        except Exception as e:
             capture_exception(data=request.json)
             return json({"message": "Internal Server error"
                      }, status=500)

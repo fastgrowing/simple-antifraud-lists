@@ -1,5 +1,4 @@
 class Record:
-
     def __init__(self, attribute, redis_conn, industry="default", merchant='default', id='*', value='*'):
         self.id = str(id)
         if industry is not None:

@@ -38,7 +38,6 @@ merchant_data = {
 
 
 async def setup_db(redis_conn):
-    # создание индексов
     logins = [x['login'] for x in await User.list_users(redis_conn=redis_conn)]
     if 'admin' not in logins:
         await merchant_index(r=redis_conn)

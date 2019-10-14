@@ -64,7 +64,7 @@ class MerchantView(HTTPMethodView):
                 return json({
                     "message": "Merchant is not existed yet."
                 }, status=404)
-        except Exception:
+        except Exception as e:
             capture_exception(data=request.json)
             return json({"message": "Internal Server error"
                          }, status=500)

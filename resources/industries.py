@@ -16,7 +16,7 @@ class IndustrieListView(HTTPMethodView):
                 ind_list = await Industry.list_industries(redis_conn=redis)
                 print(ind_list)
                 return json({"industries": ind_list}, status=200)
-        except Exception:
+        except Exception as e:
             capture_exception()
             return json({"message": "Internal Server error"
                          }, status=500)

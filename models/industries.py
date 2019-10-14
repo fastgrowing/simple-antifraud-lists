@@ -11,5 +11,5 @@ class Industry:
     @classmethod
     async def list_industries(cls, redis_conn):
         """Return the list of all available industries."""
-        list = await redis_conn.lrange('industry', 0, -1)
-        return list
+        industries = await redis_conn.lrange('industry', 0, -1)
+        return industries

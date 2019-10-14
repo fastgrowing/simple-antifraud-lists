@@ -1,5 +1,4 @@
 class Merchant:
-
     def __init__(self, redis_conn, id='*'):
         self.id = id
         self.key = str(self.id) + ':merchant'

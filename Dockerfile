@@ -17,5 +17,4 @@ RUN pip install --user -r requirements.txt
 COPY --chown=antifraud:antifraud . /opt/antifraud/
 
 EXPOSE 80
-
 CMD ["python3", "app.py"]

@@ -1,5 +1,4 @@
 class Auth:
-
     @classmethod
     async def find_merchant_by_token(cls, token, redis_conn):
         """Return the merchant information from authorization token."""
