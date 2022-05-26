@@ -13,7 +13,7 @@ sanic==0.8.3
 sanic-json-logging==0.3.2
 sanic-redis==0.1.0
 sentry-sdk==0.5.4
-ujson==1.35
+ujson==5.2.0
 urllib3==1.24.2
 uvloop==0.11.3
 websockets==5.0.1
