@@ -3,7 +3,7 @@ aioredis==1.2.0
 async-timeout==3.0.1
 asyncio==3.4.3
 Cerberus==1.2
-certifi==2018.10.15
+certifi==2022.12.7
 hiredis==0.2.0
 httptools==0.0.11
 multidict==4.4.2
